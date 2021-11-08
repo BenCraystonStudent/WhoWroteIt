@@ -40,10 +40,37 @@ public class NetworkUtils {
                 // Convert the URI to a URL.
                 URL requestURL = new URL(builtURI.toString());
 
-                ////////////////////////////////////////////////////////
-                ////////////////////////////////////////////////////////
-                ////////////////////////////////////////////////////////
+                // Open the network connection.
+                urlConnection = (HttpURLConnection) requestURL.openConnection();
+                urlConnection.setRequestMethod("GET");
+                urlConnection.connect();
 
+                // Get the InputStream.
+                InputStream inputStream = urlConnection.getInputStream();
+
+                // Create a buffered reader from that input stream.
+                reader = new BufferedReader(new InputStreamReader(inputStream));
+
+                // Use a StringBuilder to hold the incoming response.
+                StringBuilder builder = new StringBuilder();
+
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    // Add the current line to the string.
+                    builder.append(line);
+
+                    // Since this is JSON, adding a newline isn't necessary (it won't
+                    // affect parsing) but it does make debugging a *lot* easier
+                    // if you print out the completed buffer for debugging.
+                    builder.append("\n");
+                }
+
+                if (builder.length() == 0) {
+                    // Stream was empty.  Exit without parsing.
+                    return null;
+                }
+
+                bookJSONString = builder.toString();
 
         } catch (IOException e) {
             e.printStackTrace();
